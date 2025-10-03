@@ -1,5 +1,6 @@
 package com.singletonvd.todolist;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -9,8 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -30,6 +29,11 @@ public class MainActivity extends AppCompatActivity {
         initView();
         fillRandomNotes();
         showNotes();
+
+        buttonAddNote.setOnClickListener(view -> {
+            Intent intent = AddNoteActivity.makeIntent(this);
+            startActivity(intent);
+        });
     }
 
     private void initView() {
@@ -46,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showNotes() {
-        for (Note note: notes) {
+        for (Note note : notes) {
             View view = getLayoutInflater().inflate(
                     R.layout.note_item,
                     linearLayoutNotes,

@@ -5,4 +5,5 @@
     <string name="medium_priority">Medium</string>
     <string name="high_priority">High</string>
     <string name="save">Save</string>
+    <string name="enter_note_text">Please, enter note text</string>
 </resources>
