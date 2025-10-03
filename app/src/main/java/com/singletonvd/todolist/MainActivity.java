@@ -11,15 +11,12 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.ArrayList;
-import java.util.Random;
-
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout linearLayoutNotes;
     private FloatingActionButton buttonAddNote;
 
-    private ArrayList<Note> notes = new ArrayList<>();
+    private Database database = Database.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +24,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         initView();
-        fillRandomNotes();
-        showNotes();
 
         buttonAddNote.setOnClickListener(view -> {
             Intent intent = AddNoteActivity.makeIntent(this);
@@ -36,21 +31,21 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        showNotes();
+    }
+
     private void initView() {
         linearLayoutNotes = findViewById(R.id.linearLayoutNotes);
         buttonAddNote = findViewById(R.id.buttonAddNote);
     }
 
-    private void fillRandomNotes() {
-        Random random = new Random();
-        for (int i = 0; i < 20; i++) {
-            Note note = new Note(i, "Note" + i, random.nextInt(3));
-            notes.add(note);
-        }
-    }
-
     private void showNotes() {
-        for (Note note : notes) {
+        linearLayoutNotes.removeAllViews();
+
+        for (Note note : database.getNotes()) {
             View view = getLayoutInflater().inflate(
                     R.layout.note_item,
                     linearLayoutNotes,
