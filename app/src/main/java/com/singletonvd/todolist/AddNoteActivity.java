@@ -21,12 +21,14 @@ public class AddNoteActivity extends AppCompatActivity {
     private RadioButton radioButtonMediumPriority;
     private Button buttonSaveNote;
 
-    private Database database = Database.getInstance();
+    private NotesDao notesDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
+        NoteDatabase database = NoteDatabase.getInstance(getApplication());
+        notesDao = database.getNotesDao();
 
         initViews();
         radioButtonMediumPriority.setChecked(true);
@@ -50,10 +52,9 @@ public class AddNoteActivity extends AppCompatActivity {
         if (text.isEmpty()) {
             Toast.makeText(this, R.string.enter_note_text, Toast.LENGTH_SHORT).show();
         } else {
-            int id = database.getNotes().size();
             int priority = getPriority();
-            Note note = new Note(id, text, priority);
-            database.add(note);
+            Note note = new Note(text, priority);
+            notesDao.add(note);
 
             finish();
         }
