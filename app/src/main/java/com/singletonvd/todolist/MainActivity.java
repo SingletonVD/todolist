@@ -15,21 +15,22 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerViewNotes;
     private FloatingActionButton buttonAddNote;
     private NotesAdapter notesAdapter;
-
-    private NotesDao notesDao;
+    private MainViewModel mainViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mainViewModel = new MainViewModel(getApplication());
 
-        NoteDatabase noteDatabase = NoteDatabase.getInstance(getApplication());
-        notesDao = noteDatabase.getNotesDao();
         initView();
         notesAdapter = new NotesAdapter();
         recyclerViewNotes.setAdapter(notesAdapter);
 
-        notesDao.getNotes().observe(this, notes -> notesAdapter.setNotes(notes));
+        mainViewModel.getNotes().observe(
+                this,
+                notes -> notesAdapter.setNotes(notes)
+        );
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(
                 new ItemTouchHelper.SimpleCallback(
@@ -53,8 +54,7 @@ public class MainActivity extends AppCompatActivity {
                         if ((direction & ItemTouchHelper.LEFT) > 0) {
                             int position = viewHolder.getBindingAdapterPosition();
                             Note note = notesAdapter.getNotes().get(position);
-                            Thread thread = new Thread(() -> notesDao.remove(note.getId()));
-                            thread.start();
+                            mainViewModel.remove(note);
                         }
                     }
                 });
