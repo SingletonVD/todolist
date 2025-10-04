@@ -2,8 +2,6 @@ package com.singletonvd.todolist;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,14 +10,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.List;
-
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewNotes;
     private FloatingActionButton buttonAddNote;
     private NotesAdapter notesAdapter;
-    private final Handler handler = new Handler(Looper.getMainLooper());
 
     private NotesDao notesDao;
 
@@ -33,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
         initView();
         notesAdapter = new NotesAdapter();
         recyclerViewNotes.setAdapter(notesAdapter);
+
+        notesDao.getNotes().observe(this, notes -> notesAdapter.setNotes(notes));
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(
                 new ItemTouchHelper.SimpleCallback(
@@ -56,10 +53,7 @@ public class MainActivity extends AppCompatActivity {
                         if ((direction & ItemTouchHelper.LEFT) > 0) {
                             int position = viewHolder.getBindingAdapterPosition();
                             Note note = notesAdapter.getNotes().get(position);
-                            Thread thread = new Thread(() -> {
-                                notesDao.remove(note.getId());
-                                handler.post(() -> showNotes());
-                            });
+                            Thread thread = new Thread(() -> notesDao.remove(note.getId()));
                             thread.start();
                         }
                     }
@@ -75,19 +69,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        showNotes();
     }
 
     private void initView() {
         buttonAddNote = findViewById(R.id.buttonAddNote);
         recyclerViewNotes = findViewById(R.id.recyclerViewNotes);
-    }
-
-    private void showNotes() {
-        Thread thread = new Thread(() -> {
-            List<Note> notes = notesDao.getNotes();
-            handler.post(() -> notesAdapter.setNotes(notes));
-        });
-        thread.start();
     }
 }
