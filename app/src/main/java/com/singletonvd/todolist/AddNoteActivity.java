@@ -56,6 +56,7 @@ public class AddNoteActivity extends AppCompatActivity {
         if (text.isEmpty()) {
             Toast.makeText(this, R.string.enter_note_text, Toast.LENGTH_SHORT).show();
         } else {
+            buttonSaveNote.setEnabled(false);
             int priority = getPriority();
             Note note = new Note(text, priority);
             viewModel.saveNote(note);

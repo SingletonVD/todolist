@@ -8,6 +8,8 @@ material = "1.13.0"
 activity = "1.11.0"
 constraintlayout = "2.2.1"
 room = "2.8.1"
+rxjava3RxJava = "3.1.5"
+rxjava3RxAndroid = "3.0.2"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -18,7 +20,10 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 room = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-rx-java3 = { group = "androidx.room", name = "room-rxjava3", version.ref = "room" }
 room-annotation-processor = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+rx-java3-rxjava = { group = "io.reactivex.rxjava3", name = "rxjava", version.ref = "rxjava3RxJava" }
+rx-java3-rxandroid = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "rxjava3RxAndroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
