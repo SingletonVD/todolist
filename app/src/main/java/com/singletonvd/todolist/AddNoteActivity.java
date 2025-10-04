@@ -3,14 +3,13 @@ package com.singletonvd.todolist;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 public class AddNoteActivity extends AppCompatActivity {
 
@@ -22,22 +21,24 @@ public class AddNoteActivity extends AppCompatActivity {
     private RadioButton radioButtonLowPriority;
     private RadioButton radioButtonMediumPriority;
     private Button buttonSaveNote;
-
-    private NotesDao notesDao;
-    private final Handler handler = new Handler(Looper.getMainLooper());
+    private AddNoteViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
-        NoteDatabase database = NoteDatabase.getInstance(getApplication());
-        notesDao = database.getNotesDao();
 
+        viewModel = new ViewModelProvider(this).get(AddNoteViewModel.class);
         initViews();
         radioButtonMediumPriority.setChecked(true);
 
         buttonSaveNote.setOnClickListener(view -> {
             saveNote();
+        });
+        viewModel.getShouldCloseScreen().observe(this, shouldCloseScreen -> {
+            if (shouldCloseScreen) {
+                finish();
+            }
         });
     }
 
@@ -57,11 +58,7 @@ public class AddNoteActivity extends AppCompatActivity {
         } else {
             int priority = getPriority();
             Note note = new Note(text, priority);
-            Thread thread = new Thread(() -> {
-                notesDao.add(note);
-                handler.post(this::finish);
-            });
-            thread.start();
+            viewModel.saveNote(note);
         }
     }
 
