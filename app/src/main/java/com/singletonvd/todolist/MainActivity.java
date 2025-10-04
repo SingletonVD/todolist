@@ -2,16 +2,15 @@ package com.singletonvd.todolist;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,11 +27,36 @@ public class MainActivity extends AppCompatActivity {
 
         initView();
         notesAdapter = new NotesAdapter();
-        notesAdapter.setOnNoteClickListener(note -> {
-            database.remove(note.getId());
-            showNotes();
-        });
         recyclerViewNotes.setAdapter(notesAdapter);
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(
+                new ItemTouchHelper.SimpleCallback(
+                        0,
+                        ItemTouchHelper.LEFT
+                ) {
+                    @Override
+                    public boolean onMove(
+                            @NonNull RecyclerView recyclerView,
+                            @NonNull RecyclerView.ViewHolder viewHolder,
+                            @NonNull RecyclerView.ViewHolder target
+                    ) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onSwiped(
+                            @NonNull RecyclerView.ViewHolder viewHolder,
+                            int direction
+                    ) {
+                        if ((direction & ItemTouchHelper.LEFT) > 0) {
+                            int position = viewHolder.getBindingAdapterPosition();
+                            Note note = notesAdapter.getNotes().get(position);
+                            database.remove(note.getId());
+                            showNotes();
+                        }
+                    }
+                });
+        itemTouchHelper.attachToRecyclerView(recyclerViewNotes);
 
         buttonAddNote.setOnClickListener(view -> {
             Intent intent = AddNoteActivity.makeIntent(this);

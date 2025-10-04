@@ -70,6 +70,10 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.NotesViewHol
         this.onNoteClickListener = onNoteClickListener;
     }
 
+    public ArrayList<Note> getNotes() {
+        return notes;
+    }
+
     public static class NotesViewHolder extends RecyclerView.ViewHolder {
         private final TextView textViewNote;
 
