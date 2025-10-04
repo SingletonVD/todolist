@@ -3,6 +3,8 @@ package com.singletonvd.todolist;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
@@ -22,6 +24,7 @@ public class AddNoteActivity extends AppCompatActivity {
     private Button buttonSaveNote;
 
     private NotesDao notesDao;
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +57,11 @@ public class AddNoteActivity extends AppCompatActivity {
         } else {
             int priority = getPriority();
             Note note = new Note(text, priority);
-            notesDao.add(note);
-
-            finish();
+            Thread thread = new Thread(() -> {
+                notesDao.add(note);
+                handler.post(this::finish);
+            });
+            thread.start();
         }
     }
 

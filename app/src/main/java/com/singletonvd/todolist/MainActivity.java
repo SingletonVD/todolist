@@ -2,6 +2,8 @@ package com.singletonvd.todolist;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,11 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerViewNotes;
     private FloatingActionButton buttonAddNote;
     private NotesAdapter notesAdapter;
+    private final Handler handler = new Handler(Looper.getMainLooper());
 
     private NotesDao notesDao;
 
@@ -51,8 +56,11 @@ public class MainActivity extends AppCompatActivity {
                         if ((direction & ItemTouchHelper.LEFT) > 0) {
                             int position = viewHolder.getBindingAdapterPosition();
                             Note note = notesAdapter.getNotes().get(position);
-                            notesDao.remove(note.getId());
-                            showNotes();
+                            Thread thread = new Thread(() -> {
+                                notesDao.remove(note.getId());
+                                handler.post(() -> showNotes());
+                            });
+                            thread.start();
                         }
                     }
                 });
@@ -76,6 +84,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showNotes() {
-        notesAdapter.setNotes(notesDao.getNotes());
+        Thread thread = new Thread(() -> {
+            List<Note> notes = notesDao.getNotes();
+            handler.post(() -> notesAdapter.setNotes(notes));
+        });
+        thread.start();
     }
 }
